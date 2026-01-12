@@ -1,0 +1,44 @@
+ /* .asidebar{
+    width: 350px;
+    background-color: #6b0c55;
+    color: white;
+    height:732px;
+    position: fixed;
+
+} */
+ .stuinput{
+    background-color: #6b0c55;
+    
+ } 
+
+
+
+
+
+
+
+ .dashboard-container {
+  background: linear-gradient(135deg, #660650, #243b4a);
+  min-height: 100vh;
+  padding: 30px;
+  color: white;
+}
+
+.student-info {
+  /* background-color: #1c2b36; */
+  background-color: #6b0c55;
+
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.section-title {
+  border-bottom: 1px solid #555;
+  padding-bottom: 5px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+label {
+  margin-bottom: 5px;
+}
