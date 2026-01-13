@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../components/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StudentRegistration = () => {
     const [formData, setFormData] = useState({
@@ -28,10 +28,33 @@ const StudentRegistration = () => {
         }));
     };
 
+    const navigate = useNavigate();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
-        // Add registration logic here
+
+        // Validation: simple check
+        if (!formData.username || !formData.password) {
+            alert("Please provide a username and password");
+            return;
+        }
+
+        // Get existing students
+        const existingStudents = JSON.parse(localStorage.getItem('students') || '[]');
+
+        // Check if username already exists
+        if (existingStudents.some(s => s.username === formData.username)) {
+            alert("Username already exists! Please choose another.");
+            return;
+        }
+
+        // Add new student
+        existingStudents.push(formData);
+        localStorage.setItem('students', JSON.stringify(existingStudents));
+
+        alert("Registration Successful! Please Login.");
+        navigate('/');
     };
 
     return (
@@ -75,6 +98,15 @@ const StudentRegistration = () => {
                             <h3 style={styles.sectionTitle}>Account & Documents</h3>
                             <Input label="Username" name="username" value={formData.username} onChange={handleChange} placeholder="johndoe123" />
                             <Input label="Password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder="••••••••" />
+                            <div style={styles.formGroup}>
+                                <label style={styles.label}>Upload Documents</label>
+                                <input
+                                    style={{ ...styles.input, padding: '0.5rem' }}
+                                    type="file"
+                                    name="file"
+                                    onChange={handleChange}
+                                />
+                            </div>
                         </div>
                     </div>
 

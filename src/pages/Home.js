@@ -1,7 +1,43 @@
 import React from 'react';
 import LoginCard from '../components/LoginCard';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = (role, credentials) => {
+    console.log(`${role} login attempt:`, credentials);
+
+    // Check if input is not empty
+    if (!credentials.username || !credentials.password) {
+      alert('Please enter username and password');
+      return;
+    }
+
+    // Determine storage key based on role
+    const storageKey = role === 'student' ? 'students' : 'faculty';
+    const storedUsers = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
+    // Find matching user
+    const user = storedUsers.find(u => u.username === credentials.username && u.password === credentials.password);
+
+    if (user) {
+      // Login Success
+      // Store current user session
+      sessionStorage.setItem('currentUser', JSON.stringify(user));
+      sessionStorage.setItem('userRole', role);
+
+      if (role === 'student') {
+        navigate('/studentinfo');
+      } else {
+        navigate('/facultypanel');
+      }
+    } else {
+      // Login Failed
+      alert('Invalid Credentials! Please register or check your username/password.');
+    }
+  };
+
   return (
     <div style={styles.container}>
       <header style={styles.header}>
@@ -17,13 +53,13 @@ const Home = () => {
         <LoginCard
           title="Student Login"
           role="student"
-          onLogin={() => console.log('Student Login')}
+          onLogin={(creds) => handleLogin('student', creds)}
           registerPath="/register/student"
         />
         <LoginCard
           title="Faculty Login"
           role="faculty"
-          onLogin={() => console.log('Faculty Login')}
+          onLogin={(creds) => handleLogin('faculty', creds)}
           registerPath="/register/faculty"
         />
       </div>
