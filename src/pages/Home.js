@@ -9,7 +9,8 @@ const Home = () => {
     console.log(`${role} login attempt:`, credentials);
 
     // Check if input is not empty
-    if (!credentials.username || !credentials.password) {
+    if (!credentials.username || !credentials.password) 
+    {
       alert('Please enter username and password');
       return;
     }

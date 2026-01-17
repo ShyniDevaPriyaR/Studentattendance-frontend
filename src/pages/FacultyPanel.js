@@ -1,159 +1,123 @@
-import React from 'react'
-import "./Facultypan.css"
-
-
+import React, { useState } from 'react';
+import FacultySidebar from '../components/FacultySidebar';
+import FacultyNavbar from '../components/FacultyNavbar';
+import './FacultyPanel.css';
 
 const FacultyPanel = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [date, setDate] = useState('');
+
+  // Mock Data for Summary Cards
+  const summaryData = {
+    present: 45,
+    absent: 5,
+    pendingLeaves: 3
+  };
+
+  // Mock Data for Attendance Table
+  const [attendanceData, setAttendanceData] = useState([
+    { id: 1, name: 'John Doe', date: '2023-10-25', punchIn: '09:00 AM', punchOut: '05:00 PM', status: 'Present' },
+    { id: 2, name: 'Jane Smith', date: '2023-10-25', punchIn: '09:15 AM', punchOut: '05:10 PM', status: 'Present' },
+    { id: 3, name: 'Michael Johnson', date: '2023-10-25', punchIn: '-', punchOut: '-', status: 'Absent' },
+    { id: 4, name: 'Emily Davis', date: '2023-10-25', punchIn: '08:55 AM', punchOut: '04:55 PM', status: 'Present' },
+    { id: 5, name: 'Robert Wilson', date: '2023-10-25', punchIn: '-', punchOut: '-', status: 'Absent' },
+  ]);
+
+  const handleApplyFilter = () => {
+    // Implement filter logic here if needed for demo
+    console.log('Filtering by:', searchTerm, date);
+  };
+
+  const handleClearFilter = () => {
+    setSearchTerm('');
+    setDate('');
+  };
+
   return (
-    // <div className='faculty-container'>
-     
-    //   <div className="row min-vh-100">
-    //     <div className="col-12 col-md-3 mb-3 mb-md-0 sidebar">
-    //     <h2 className='text-warning'>Faculty Panel</h2>
+    <div className="faculty-panel-container">
+      <FacultyNavbar />
+      <FacultySidebar />
 
-    //       <ul className='list-unstyled list-group mt-3'>
-    //         <li className='list-group-item border-white border-end-0 border-start-0 lis border-left-0 rounded-0'>Mark Attendance</li>
-    //         <li className='list-group-item border-white border-end-0 border-start-0 lis'>Search Student</li>
-    //         <li className='list-group-item border-white border-end-0 border-start-0 lis'>Leave Requests</li>
-    //         <li className='list-group-item border-white border-end-0 border-start-0 rounded-0 lis'>Logout</li>
-    //       </ul>
-    //     </div>
-    //     <div className="col-md-9">
-    //       <div className='main'>
-    //         <div className='papmain '>
-    //           <div className='d-flex pap'>
-    //             <div className='pap1 text-center border-0' >
-    //               <p>Present</p>
-    //               <h3>0</h3>
-    //             </div>
-    //             <div className='pap1 text-center border-0'>
-    //               <p>Absent</p>
-    //               <h3>6</h3>
-    //             </div>
-    //             <div className='pap1 text-center border-0'>
-    //               <p>Pending Leaves</p>
-    //               <h3>4</h3>
-    //             </div>
-    //           </div>
-    //         </div>
+      <div className="main-content">
+        <div className="dashboard-header">
+          <h1>Dashboard</h1>
+          <p>Welcome back, Faculty</p>
+        </div>
 
-    //         <div className="filters ms-2 mt-3">
-    //           <form class="d-flex  gap-3">
-    //             <div className='d-flex'>
-    //               <input class="form me-2 border-0 searchbar" type="search" placeholder="Search" aria-label="Search" />
-    //               <button class="btn btn-outline-success searchbar" type="submit">Search</button>
-    //             </div>
-    //             <input type="date" className='rounded-1 border-0' />
-    //             <button className="apply btn-warning border-0 rounded-1">Apply Filter</button>
-    //             <button className="clear btn-primary border-0 rounded-1">Clear</button>
-    //           </form>
-    //         </div>
-
-    //         <h3 className="table-title text-center text-warning mt-5">Mark Attendance</h3>
-    //         <div className="table-wrapper me-5 ">
-    //           <table className='table table-bordered  table-striped table-hover tableround'>
-    //             <thead>
-    //               <tr>
-    //                 <th>Sno</th>
-    //                 <th>Student Name</th>
-    //                 <th>Attendance Date</th>
-    //                 <th>Punch In Time </th>
-    //                 <th>Punch Out Time</th>
-    //                 <th>Status</th>
-    //               </tr>
-    //             </thead>
-    //             <tbody>
-    //               <tr>
-    //                 <td>1</td>
-    //                 <td>priya</td>
-    //                 <td>22</td>
-    //                 <td>10:00</td>
-    //                 <td>9:00</td>
-    //                 <td>Absent</td>
-    //               </tr>
-    //             </tbody>
-    //           </table>
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </div>
-    // </div>
-
-
-
-
-      <div className="faculty-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <h2>Faculty Panel</h2>
-        <ul>
-          <li>👤 Mark Attendance</li>
-          <li>🔍 Search Student</li>
-          <li>📄 Leave Requests</li>
-          <li>🚪 Logout</li>
-        </ul>
-      </aside>
-
-      {/* Content */}
-      <main className="content">
-        {/* Stats */}
-        <div className="stats">
-          <div className="card">
-            <p>Present</p>
-            <h3>0</h3>
+        {/* Section 1: Summary Cards */}
+        <div className="summary-cards">
+          <div className="card present">
+            <h3>Present</h3>
+            <div className="count">{summaryData.present}</div>
           </div>
-          <div className="card">
-            <p>Absent</p>
-            <h3>6</h3>
+          <div className="card absent">
+            <h3>Absent</h3>
+            <div className="count">{summaryData.absent}</div>
           </div>
-          <div className="card">
-            <p>Pending Leaves</p>
-            <h3>4</h3>
+          <div className="card pending">
+            <h3>Pending Leaves</h3>
+            <div className="count">{summaryData.pendingLeaves}</div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="filters">
-          <input type="text" placeholder="Search by name or course..." />
-          <input type="date" />
-          <button className="apply">Apply Filter</button>
-          <button className="clear">Clear</button>
+        {/* Section 2: Filters */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <input
+              type="text"
+              placeholder="Search Student..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="date-input"
+            />
+            <button className="btn-apply" onClick={handleApplyFilter}>Apply Filter</button>
+            <button className="btn-clear" onClick={handleClearFilter}>Clear</button>
+          </div>
         </div>
 
-        {/* Table */}
-        <h3 className="title">Mark Attendance</h3>
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Sno</th>
-                <th>Student Name</th>
-                <th>Date</th>
-                <th>Punch In</th>
-                <th>Punch Out</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              
+        {/* Section 3: Mark Attendance Table */}
+        <div className="attendance-section">
+          <h2>Mark Attendance</h2>
+          <div className="table-responsive">
+            <table className="attendance-table">
+              <thead>
                 <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td className="absent">Absent</td>
+                  <th>S.No</th>
+                  <th>Student Name</th>
+                  <th>Date</th>
+                  <th>Punch In</th>
+                  <th>Punch Out</th>
+                  <th>Status</th>
                 </tr>
-              
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {attendanceData.map((record, index) => (
+                  <tr key={record.id}>
+                    <td>{index + 1}</td>
+                    <td>{record.name}</td>
+                    <td>{record.date}</td>
+                    <td>{record.punchIn}</td>
+                    <td>{record.punchOut}</td>
+                    <td>
+                      <span className={`status-badge ${record.status.toLowerCase()}`}>
+                        {record.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
+  );
+};
 
-
-
-  )
-}
-
-export default FacultyPanel
+export default FacultyPanel;
