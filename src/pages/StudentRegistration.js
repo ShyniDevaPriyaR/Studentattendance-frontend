@@ -30,9 +30,8 @@ const StudentRegistration = () => {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
 
         // Validation: simple check
         if (!formData.username || !formData.password) {
@@ -40,21 +39,42 @@ const StudentRegistration = () => {
             return;
         }
 
-        // Get existing students
-        const existingStudents = JSON.parse(localStorage.getItem('students') || '[]');
+        try {
+            const submissionData = new FormData();
+            submissionData.append('name', formData.fullName);
+            submissionData.append('email', formData.email);
+            submissionData.append('username', formData.username);
+            submissionData.append('password', formData.password);
+            submissionData.append('college', formData.collegeName);
+            submissionData.append('qualification', formData.qualification);
+            submissionData.append('year', formData.session);
+            submissionData.append('parentContact', formData.phone);
+            submissionData.append('role', 'student');
 
-        // Check if username already exists
-        if (existingStudents.some(s => s.username === formData.username)) {
-            alert("Username already exists! Please choose another.");
-            return;
+            // Append the file if selected (it was stored in formData.file via handleChange)
+            // Note: handleChange was modified slightly to handle files, need to double check
+            if (formData.profilePic) {
+                submissionData.append('profilePic', formData.profilePic);
+            }
+
+            const response = await fetch('http://localhost:6010/register', {
+                method: 'POST',
+                // Content-Type header not needed for FormData, browser sets it with boundary
+                body: submissionData
+            });
+
+            const responseData = await response.json();
+
+            if (response.ok) {
+                alert("Registration Successful! Please Login.");
+                navigate('/');
+            } else {
+                alert(`Registration Failed: ${responseData.message || responseData.error}`);
+            }
+        } catch (error) {
+            console.error("Error registering:", error);
+            alert("Registration failed. Please try again.");
         }
-
-        // Add new student
-        existingStudents.push(formData);
-        localStorage.setItem('students', JSON.stringify(existingStudents));
-
-        alert("Registration Successful! Please Login.");
-        navigate('/');
     };
 
     return (
@@ -103,7 +123,7 @@ const StudentRegistration = () => {
                                 <input
                                     style={{ ...styles.input, padding: '0.5rem' }}
                                     type="file"
-                                    name="file"
+                                    name="profilePic"
                                     onChange={handleChange}
                                 />
                             </div>

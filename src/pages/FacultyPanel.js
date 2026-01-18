@@ -1,36 +1,98 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FacultySidebar from '../components/FacultySidebar';
 import FacultyNavbar from '../components/FacultyNavbar';
 import './FacultyPanel.css';
 
 const FacultyPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
+  const [allStudents, setAllStudents] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [summaryData, setSummaryData] = useState({ present: 0, absent: 0, pendingLeaves: 0 });
 
-  // Mock Data for Summary Cards
-  const summaryData = {
-    present: 45,
-    absent: 5,
-    pendingLeaves: 3
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  useEffect(() => {
+    processData();
+  }, [allStudents, date, searchTerm]);
+
+  const fetchStudents = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:6010/api/students', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAllStudents(data);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
+    }
   };
 
-  // Mock Data for Attendance Table
-  const [attendanceData, setAttendanceData] = useState([
-    { id: 1, name: 'John Doe', date: '2023-10-25', punchIn: '09:00 AM', punchOut: '05:00 PM', status: 'Present' },
-    { id: 2, name: 'Jane Smith', date: '2023-10-25', punchIn: '09:15 AM', punchOut: '05:10 PM', status: 'Present' },
-    { id: 3, name: 'Michael Johnson', date: '2023-10-25', punchIn: '-', punchOut: '-', status: 'Absent' },
-    { id: 4, name: 'Emily Davis', date: '2023-10-25', punchIn: '08:55 AM', punchOut: '04:55 PM', status: 'Present' },
-    { id: 5, name: 'Robert Wilson', date: '2023-10-25', punchIn: '-', punchOut: '-', status: 'Absent' },
-  ]);
+  const processData = () => {
+    if (!allStudents.length) return;
+
+    let presentCount = 0;
+    let absentCount = 0;
+    let pendingLeavesCount = 0;
+
+    // Filter by name if search term exists
+    const filteredStudents = allStudents.filter(student =>
+      (student.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const processedAttendance = filteredStudents.map((student, index) => {
+      // Find attendance for the selected date
+      const record = student.attendance?.find(a => a.date === date);
+
+      // Check leaves
+      const hasLeave = student.leaveRequests?.some(l => l.status === 'Pending');
+      if (hasLeave) pendingLeavesCount++;
+
+      let status = 'Absent';
+      let punchIn = '-';
+      let punchOut = '-';
+
+      if (record) {
+        status = record.status || 'Present';
+        punchIn = record.inTime || '-';
+        punchOut = record.outTime || '-';
+        presentCount++;
+      } else {
+        absentCount++;
+      }
+
+      return {
+        id: student._id,
+        name: student.name,
+        date: date,
+        punchIn,
+        punchOut,
+        status
+      };
+    });
+
+    setAttendanceData(processedAttendance);
+    setSummaryData({
+      present: presentCount,
+      absent: absentCount,
+      pendingLeaves: pendingLeavesCount // Logic for total pending leaves across all students
+    });
+  };
 
   const handleApplyFilter = () => {
-    // Implement filter logic here if needed for demo
-    console.log('Filtering by:', searchTerm, date);
+    processData();
   };
 
   const handleClearFilter = () => {
     setSearchTerm('');
-    setDate('');
+    setDate(new Date().toISOString().split('T')[0]);
   };
 
   return (
@@ -76,7 +138,7 @@ const FacultyPanel = () => {
               onChange={(e) => setDate(e.target.value)}
               className="date-input"
             />
-            <button className="btn-apply" onClick={handleApplyFilter}>Apply Filter</button>
+            {/* <button className="btn-apply" onClick={handleApplyFilter}>Apply Filter</button> */}
             <button className="btn-clear" onClick={handleClearFilter}>Clear</button>
           </div>
         </div>
@@ -105,12 +167,17 @@ const FacultyPanel = () => {
                     <td>{record.punchIn}</td>
                     <td>{record.punchOut}</td>
                     <td>
-                      <span className={`status-badge ${record.status.toLowerCase()}`}>
+                      <span className={`status-badge ${(record.status || "").toLowerCase()}`}>
                         {record.status}
                       </span>
                     </td>
                   </tr>
                 ))}
+                {attendanceData.length === 0 && (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center' }}>No records found for this date.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

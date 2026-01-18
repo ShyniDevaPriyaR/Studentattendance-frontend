@@ -18,15 +18,38 @@ const StudentInfo = () => {
     });
 
     useEffect(() => {
-        const currentUser = sessionStorage.getItem('currentUser');
-        if (currentUser) {
-            const parsedUser = JSON.parse(currentUser);
-            setStudent(prev => ({
-                ...prev,
-                ...parsedUser,
-                name: parsedUser.fullName || parsedUser.name || prev.name
-            }));
-        }
+        const fetchStudentData = async () => {
+            const currentUser = sessionStorage.getItem('currentUser');
+            if (currentUser) {
+                const parsedUser = JSON.parse(currentUser);
+                const userId = parsedUser._id;
+
+                try {
+                    const token = sessionStorage.getItem('token');
+                    const response = await fetch(`http://localhost:6010/api/student/${userId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setStudent(data);
+                        setTrainerData({ name: data.trainerName || "", domain: data.domain || "" });
+                        setLeaveRequest(prev => ({ ...prev })); // keep default/reset
+
+                        // Set attendance for today if exists
+                        const today = new Date().toISOString().split('T')[0];
+                        const todayRecord = data.attendance?.find(a => a.date === today);
+                        if (todayRecord) {
+                            setAttendance({ inTime: todayRecord.inTime, outTime: todayRecord.outTime });
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error fetching student data", error);
+                }
+            }
+        };
+        fetchStudentData();
     }, []);
 
     // State
@@ -40,35 +63,101 @@ const StudentInfo = () => {
         navigate('/');
     };
 
-    const handleTrainerSave = () => {
-        alert(`Trainer Info Saved:\nName: ${trainerData.name}\nDomain: ${trainerData.domain}`);
-    };
-
-    const handlePunch = (type) => {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString();
-
-        if (type === 'in') {
-            setAttendance(prev => ({ ...prev, inTime: timeString }));
-        } else {
-            setAttendance(prev => ({ ...prev, outTime: timeString }));
+    const handleTrainerSave = async () => {
+        try {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(`http://localhost:6010/api/student/${student._id}/trainer`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    trainerName: trainerData.name,
+                    domain: trainerData.domain
+                })
+            });
+            if (response.ok) {
+                alert(`Trainer Info Saved:\nName: ${trainerData.name}\nDomain: ${trainerData.domain}`);
+            } else {
+                alert("Failed to save trainer info");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error saving trainer info");
         }
     };
 
-    const handleLeaveSubmit = (e) => {
+    const handlePunch = async (type) => {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        const dateString = now.toISOString().split('T')[0];
+
+        try {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(`http://localhost:6010/api/student/${student._id}/attendance`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    date: dateString,
+                    type: type,
+                    time: timeString
+                })
+            });
+
+            if (response.ok) {
+                if (type === 'in') {
+                    setAttendance(prev => ({ ...prev, inTime: timeString }));
+                } else {
+                    setAttendance(prev => ({ ...prev, outTime: timeString }));
+                }
+            } else {
+                alert("Failed to mark attendance");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error marking attendance: " + error.message);
+        }
+    };
+
+    const handleLeaveSubmit = async (e) => {
         e.preventDefault();
-        console.log("Leave Request:", leaveRequest);
-        alert("Leave Request Submitted Successfully!");
-        setLeaveRequest({ date: "", session: "Full Day", reason: "" }); // Reset form
+        try {
+            const token = sessionStorage.getItem('token');
+            const response = await fetch(`http://localhost:6010/api/student/${student._id}/leave`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(leaveRequest)
+            });
+
+            if (response.ok) {
+                alert("Leave Request Submitted Successfully!");
+                setLeaveRequest({ date: "", session: "Full Day", reason: "" }); // Reset form
+            } else {
+                alert("Failed to submit leave request");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error submitting leave request");
+        }
     };
 
     return (
         <div className='dashboard-container'>
             {/* Header */}
             <header className="dashboard-header">
-                <h3>
-                    Welcome, <span className="text-gradient">{student.name}</span>!
-                </h3>
+                <div className="header-greeting">
+                    <h3>
+                        Welcome, <span className="text-gradient">{student.name}</span>!
+                    </h3>
+                    <p className="current-date">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
                 <button className="logout-btn" onClick={handleLogout}>Logout</button>
             </header>
 
@@ -76,7 +165,13 @@ const StudentInfo = () => {
                 {/* Sidebar */}
                 <aside className="student-sidebar">
                     <div className="profile-section">
-                        <img src={student.profilePic} alt="Profile" className='profile-img' />
+                        <img
+                            src={student.profilePic && student.profilePic.startsWith('/uploads')
+                                ? `http://localhost:6010${student.profilePic}`
+                                : student.profilePic || "https://i.pravatar.cc/150?img=12"}
+                            alt="Profile"
+                            className='profile-img'
+                        />
                         <h4>{student.name}</h4>
                         <span className="text-muted">{student.username}</span>
                     </div>

@@ -24,27 +24,35 @@ const FacultyRegister = () => {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Faculty Form submitted:', formData);
 
         if (!formData.username || !formData.password) {
             alert("Please provide a username and password");
             return;
         }
 
-        const existingFaculty = JSON.parse(localStorage.getItem('faculty') || '[]');
+        try {
+            const response = await fetch('http://localhost:6010/faculty-register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
 
-        if (existingFaculty.some(f => f.username === formData.username)) {
-            alert("Username already exists! Please choose another.");
-            return;
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Faculty Registration Successful! Please Login.");
+                navigate('/');
+            } else {
+                alert(data.message || "Registration failed");
+            }
+        } catch (error) {
+            console.error("Registration validation error:", error);
+            alert("Registration failed. Please try again.");
         }
-
-        existingFaculty.push(formData);
-        localStorage.setItem('faculty', JSON.stringify(existingFaculty));
-
-        alert("Faculty Registration Successful! Please Login.");
-        navigate('/');
     };
 
     return (
