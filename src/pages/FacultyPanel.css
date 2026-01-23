@@ -181,6 +181,113 @@
     border-bottom: none;
 }
 
+/* My Attendance Section */
+.my-attendance-section {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+.my-attendance-section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: var(--text-dark);
+}
+
+.punch-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-punch-in,
+.btn-punch-out {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-punch-in {
+    background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+    color: white;
+}
+
+.btn-punch-in:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-punch-out {
+    background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+}
+
+.btn-punch-out:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-punch-in:disabled,
+.btn-punch-out:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.today-status {
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border-left: 4px solid #667eea;
+}
+
+.today-status p {
+    margin: 0.5rem 0;
+    color: #4a5568;
+}
+
+.today-status strong {
+    color: var(--text-dark);
+}
+
+/* Message Box */
+.message-box {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-box.success {
+    background: #c6f6d5;
+    color: #22543d;
+    border-left: 4px solid #48bb78;
+}
+
+.message-box.error {
+    background: #fed7d7;
+    color: #822727;
+    border-left: 4px solid #f56565;
+}
+
 .status-badge {
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;

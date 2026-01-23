@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import FacultySidebar from '../components/FacultySidebar';
-import FacultyNavbar from '../components/FacultyNavbar';
 import './FacultyPanel.css';
 
 const FacultyPanel = () => {
@@ -97,15 +96,9 @@ const FacultyPanel = () => {
 
   return (
     <div className="faculty-panel-container">
-      <FacultyNavbar />
       <FacultySidebar />
 
       <div className="main-content">
-        <div className="dashboard-header">
-          <h1>Dashboard</h1>
-          <p>Welcome back, Faculty</p>
-        </div>
-
         {/* Section 1: Summary Cards */}
         <div className="summary-cards">
           <div className="card present">

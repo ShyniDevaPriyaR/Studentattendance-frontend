@@ -89,7 +89,7 @@ const Home = () => {
 
 const styles = {
   container: {
-    minHeight: 'calc(100vh - 80px)', // Adjust based on navbar height
+    minHeight: 'calc(100vh - 100px)', // Adjust based on navbar height (100px)
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',

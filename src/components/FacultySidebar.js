@@ -8,7 +8,7 @@ const FacultySidebar = () => {
 
     const menuItems = [
         { name: 'Mark Attendance', icon: '📝', path: '/facultypanel' },
-        { name: 'Search Student', icon: '🔍', path: '/search-student' },
+        { name: 'Faculty Attendance', icon: '👨‍🏫', path: '/faculty-attendance' },
         { name: 'Leave Requests', icon: '📩', path: '/leave-requests' },
     ];
 

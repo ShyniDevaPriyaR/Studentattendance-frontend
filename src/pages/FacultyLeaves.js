@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import FacultySidebar from '../components/FacultySidebar';
-import FacultyNavbar from '../components/FacultyNavbar';
 import './FacultyPanel.css'; // Reusing panel styles for consistency
 
 const FacultyLeaves = () => {
@@ -29,7 +28,6 @@ const FacultyLeaves = () => {
 
     return (
         <div className="faculty-panel-container">
-            <FacultyNavbar />
             <FacultySidebar />
 
             <div className="main-content">

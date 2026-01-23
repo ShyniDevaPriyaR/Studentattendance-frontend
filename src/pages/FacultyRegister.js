@@ -24,13 +24,39 @@ const FacultyRegister = () => {
 
     const navigate = useNavigate();
 
+    const validateForm = () => {
+        const { username, password, email, phone } = formData;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^\d{10}$/;
+
+        if (!username || !password || !email || !phone) {
+            alert("All fields are required.");
+            return false;
+        }
+
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email address.");
+            return false;
+        }
+
+        if (!phoneRegex.test(phone)) {
+            alert("Phone number must be 10 digits.");
+            return false;
+        }
+
+        if (!passwordRegex.test(password)) {
+            alert("Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.");
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.username || !formData.password) {
-            alert("Please provide a username and password");
-            return;
-        }
+        if (!validateForm()) return;
 
         try {
             const response = await fetch('http://localhost:6010/faculty-register', {
